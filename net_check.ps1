@@ -14,7 +14,7 @@ Add-Type -AssemblyName System.Data
 # ---------- 自提权（直接运行本脚本时） ----------
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) {
-    Start-Process -FilePath 'powershell.exe' -ArgumentList ('-NoProfile -ExecutionPolicy Bypass -File "{0}"' -f $PSCommandPath) -Verb RunAs
+    Start-Process -FilePath 'powershell.exe' -ArgumentList ('-NoProfile -ExecutionPolicy Bypass -File "{0}"' -f $PSCommandPath) -Verb RunAs -WindowStyle Hidden
     exit
 }
 
@@ -438,11 +438,21 @@ function Show-Gui {
     [void]$dt.Columns.Add('检查项')
     [void]$dt.Columns.Add('状态')
     [void]$dt.Columns.Add('说明')
-    $grid.DataSource = $dt
-    # 列宽按截图：检查项 140 / 状态 105 / 说明自适应填充剩余
+
+    # 手动建列：自动生成列晚于赋值会导致 Width 失效（Columns 为空），故关闭自动生成
+    $grid.AutoGenerateColumns = $false
+    foreach ($n in '检查项', '状态', '说明') {
+        $col = New-Object System.Windows.Forms.DataGridViewTextBoxColumn
+        $col.Name = $n
+        $col.HeaderText = $n
+        $col.DataPropertyName = $n
+        [void]$grid.Columns.Add($col)
+    }
+    # 检查项 / 状态 固定宽度；说明列填充剩余（窗口内除两列外的最大宽度，随窗口自适应）
     $grid.Columns['检查项'].Width = 140
-    $grid.Columns['状态'].Width = 105
+    $grid.Columns['状态'].Width = 110
     $grid.Columns['说明'].AutoSizeMode = 'Fill'
+    $grid.DataSource = $dt
 
     $form.Controls.Add($grid)
     $form.Controls.Add($log)
