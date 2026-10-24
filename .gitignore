@@ -1,0 +1,29 @@
+# 运行时备份（含本机网络配置，切勿提交）
+**/backup/
+
+# 临时文件
+*.tmp
+*.temp
+**/tmp/
+
+# 日志
+*.log
+
+# 密钥与本地配置
+.env
+.env.*
+*.key
+*.pem
+secrets.*
+local.settings.json
+
+# 压缩包与大文件
+*.zip
+*.7z
+*.rar
+*.iso
+
+# 系统文件
+Thumbs.db
+desktop.ini
+.DS_Store
